@@ -1,0 +1,33 @@
+# Multi-stage build para Frontend React
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copiar package files
+COPY frontend/package.json frontend/yarn.lock ./
+
+# Instalar dependências
+RUN yarn install --frozen-lockfile
+
+# Copiar código fonte
+COPY frontend/ .
+
+# Build da aplicação
+RUN yarn build
+
+# Stage de produção com nginx
+FROM nginx:alpine
+
+# Copiar configuração customizada do nginx
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+
+# Copiar arquivos buildados
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
