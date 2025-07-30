@@ -1,0 +1,44 @@
+# Patches específicos para o ambiente de homologação
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: backend
+        env:
+        - name: ENVIRONMENT
+          value: "homologation"
+        - name: LOG_LEVEL
+          value: "INFO"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: frontend
+        env:
+        - name: ENVIRONMENT
+          value: "homologation"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"

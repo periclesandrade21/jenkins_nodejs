@@ -1,80 +1,203 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-# IDE and editors
-.idea/
-.vscode/
+# C extensions
+*.so
 
-# Dependencies
-node_modules/
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# Testing
-/coverage
-
-# Next.js
-/.next/
-/out/
-next-env.d.ts
-*.tsbuildinfo
-
-# Production builds
-/build
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
 dist/
-dist
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Environment files (comprehensive coverage)
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
 
-*token.json*
-*credentials.json*
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
 
-# Logs and debug files
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Node.js
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
 .pnpm-debug.log*
-dump.rdb
 
-# System files
-.DS_Store
-*.pem
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Python
-__pycache__/
-*pyc*
-venv/
-.venv/
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
 
-# Development tools
-chainlit.md
-.chainlit
-.ipynb_checkpoints/
-.ac
+# nyc test coverage
+.nyc_output
 
-# Deployment
-.vercel
+# Dependency directories
+jspm_packages/
 
-# Data and databases
-agenthub/agents/youtube/db
+# TypeScript cache
+*.tsbuildinfo
 
-# Archive files and large assets
-**/*.zip
-**/*.tar.gz
-**/*.tar
-**/*.tgz
-*.pack
-*.deb
-*.dylib
+# Optional npm cache directory
+.npm
 
-# Build caches
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+out
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
 .cache/
+public
 
-# Mobile development
-android-sdk/ 
+# Storybook build outputs
+.out
+.storybook-out
+storybook-static
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+*.log
+
+# Security and secrets
+*.pem
+*.key
+*.crt
+kubeconfig*
+.kube/
+secrets/
+
+# Jenkins
+jenkins_home/
+.jenkins/
+
+# Security reports
+security-reports/
+*.json.bak
+semgrep-*.json
+trivy-*.json
+zap-*.json
+zap-*.html
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary test files
+test-results/
+allure-results/
+
+# IDE specific
+.vscode/settings.json
+.idea/workspace.xml
+.idea/tasks.xml
+
+# Local environment files
+.env.local
+.env.*.local
+
+# Kubernetes generated files
+*.generated.yaml
+
+# Helm charts
+charts/*/charts/
+charts/*/requirements.lock
+
+# ArgoCD local configs
+argocd-local/
+
+# CI/CD temporary files
+build-artifacts/
+deployment-logs/
