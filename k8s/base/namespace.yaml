@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-dev
+  labels:
+    name: app-dev
+    environment: development
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-hml
+  labels:
+    name: app-hml
+    environment: homologation
