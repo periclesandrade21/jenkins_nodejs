@@ -1,0 +1,142 @@
+# Jenkins Configuration as Code (JCasC)
+jenkins:
+  systemMessage: "Jenkins configurado via Configuration as Code para FastAPI + React"
+  
+  numExecutors: 4
+  
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          password: ${JENKINS_ADMIN_PASSWORD:-admin123}
+        - id: developer
+          password: ${JENKINS_DEV_PASSWORD:-dev123}
+  
+  authorizationStrategy:
+    projectMatrix:
+      permissions:
+        - "Overall/Administer:admin"
+        - "Overall/Read:authenticated"
+        - "Job/Build:developer"
+        - "Job/Read:developer"
+        - "Job/Workspace:developer"
+  
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+  
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: DOCKER_REGISTRY
+            value: ${DOCKER_REGISTRY:-your-registry.com}
+          - key: SONARQUBE_URL
+            value: ${SONARQUBE_URL:-http://sonarqube:9000}
+
+# Configuração de credenciais
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: GLOBAL
+              id: docker-registry-credentials
+              username: ${DOCKER_REGISTRY_USER}
+              password: ${DOCKER_REGISTRY_PASSWORD}
+              description: "Docker Registry Credentials"
+          
+          - string:
+              scope: GLOBAL
+              id: sonar-token
+              secret: ${SONARQUBE_TOKEN}
+              description: "SonarQube Authentication Token"
+          
+          - file:
+              scope: GLOBAL
+              id: kubeconfig
+              fileName: kubeconfig
+              secretBytes: ${KUBECONFIG_B64}
+              description: "Kubernetes Configuration"
+          
+          - usernamePassword:
+              scope: GLOBAL
+              id: git-credentials
+              username: ${GIT_USERNAME}
+              password: ${GIT_TOKEN}
+              description: "Git Repository Credentials"
+          
+          - string:
+              scope: GLOBAL
+              id: slack-token
+              secret: ${SLACK_TOKEN}
+              description: "Slack Notification Token"
+
+# Configuração do SonarQube
+sonar:
+  installations:
+    - name: SonarQube
+      serverUrl: ${SONARQUBE_URL:-http://sonarqube:9000}
+      credentialsId: sonar-token
+
+# Configuração de ferramentas
+tool:
+  sonarRunnerInstallation:
+    installations:
+      - name: SonarQubeScanner
+        properties:
+          - installSource:
+              installers:
+                - sonarRunnerInstaller:
+                    id: "4.8.0.2856"
+
+  dockerTool:
+    installations:
+      - name: Docker
+        properties:
+          - installSource:
+              installers:
+                - fromDocker:
+                    version: "latest"
+
+  git:
+    installations:
+      - name: Default
+        home: git
+
+# Jobs seed
+jobs:
+  - script: |
+      multibranchPipelineJob('fastapi-react-app') {
+        branchSources {
+          git {
+            id('fastapi-react-app')
+            remote('https://github.com/periclesandrade21/jenkins_nodejs.git')
+            credentialsId('git-credentials')
+          }
+        }
+        
+        factory {
+          workflowBranchProjectFactory {
+            scriptPath('Jenkinsfile')
+          }
+        }
+        
+        configure { node ->
+          def traits = node / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits'
+          traits << 'jenkins.plugins.git.traits.BranchDiscoveryTrait' {
+            strategyId(1)
+          }
+          traits << 'jenkins.plugins.git.traits.OriginPullRequestDiscoveryTrait' {
+            strategyId(1)
+          }
+        }
+      }
+
+# Configuração do Slack
+unclassified:
+  slackNotifier:
+    baseUrl: ${SLACK_BASE_URL}
+    teamDomain: ${SLACK_TEAM_DOMAIN}
+    token: ${SLACK_TOKEN}
+    room: '#deployments'
