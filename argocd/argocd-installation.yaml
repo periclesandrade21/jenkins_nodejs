@@ -1,0 +1,125 @@
+# ArgoCD Installation and Configuration
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+  labels:
+    name: argocd
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ArgoCD
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  # Configurações do servidor
+  server:
+    host: argocd.yourdomain.com
+    insecure: false
+    grpc:
+      host: argocd-grpc.yourdomain.com
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+      tls:
+      - hosts:
+        - argocd.yourdomain.com
+        - argocd-grpc.yourdomain.com
+        secretName: argocd-tls
+    
+  # Configurações do controlador
+  controller:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: 500m
+        memory: 2Gi
+    
+  # Configurações do repositório
+  repo:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
+    
+  # Configurações do Redis
+  redis:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    
+  # Configurações RBAC
+  rbac:
+    defaultPolicy: 'role:readonly'
+    policy: |
+      g, argocd-admins, role:admin
+      g, developers, role:developer
+    scopes: '[groups]'
+  
+  # Configurações de usuários
+  users:
+    "admin":
+      enabled: true
+      capabilities:
+      - login
+    "developer":
+      enabled: true
+      capabilities:
+      - login
+      - apiKey
+  
+  # Configurações iniciais
+  initialSSHKnownHosts:
+    excludedefaulthosts: false
+    keys: |
+      github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+  
+  # Configurações do Dex (OIDC)
+  dex:
+    openShiftOAuth: false
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+  
+  # Configurações de HA
+  ha:
+    enabled: false
+    redisProxyImage: haproxy
+    redisProxyVersion: "2.0.4"
+  
+  # Configurações de recursos
+  resourceExclusions: |
+    - apiGroups:
+      - tekton.dev
+      clusters:
+      - "*"
+      kinds:
+      - TaskRun
+      - PipelineRun
+  
+  # Configurações do repositório
+  repositoryCredentials: |
+    - url: https://github.com/periclesandrade21
+      passwordSecret:
+        name: repo-creds
+        key: password
+      usernameSecret:
+        name: repo-creds
+        key: username
