@@ -1,0 +1,63 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app-network-policy
+  namespace: app-dev
+  labels:
+    app: fastapi-react-app
+    environment: development
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Permitir tráfego do ingress controller
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+  # Permitir comunicação entre pods da aplicação
+  - from:
+    - podSelector:
+        matchLabels:
+          app: backend
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+  - from:
+    - podSelector:
+        matchLabels:
+          app: mongodb
+  egress:
+  # Permitir DNS
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+  # Permitir comunicação com MongoDB
+  - to:
+    - podSelector:
+        matchLabels:
+          app: mongodb
+    ports:
+    - protocol: TCP
+      port: 27017
+  # Permitir comunicação com backend
+  - to:
+    - podSelector:
+        matchLabels:
+          app: backend
+    ports:
+    - protocol: TCP
+      port: 8001
+  # Permitir tráfego HTTPS para externos (APIs, etc)
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 80
